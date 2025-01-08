@@ -1,7 +1,8 @@
 <template>
-    <lightning-datatable 
-        key-field="Id"
-        data={objectList}
-        columns={dataColumns}>
+    <lightning-spinner lwc:if={isLoading}></lightning-spinner>
+    <lightning-input type="text" label="Search" onchange={handleSearchChange}
+        class="slds-m-bottom_medium"></lightning-input>
+
+    <lightning-datatable key-field="Id" data={filteredObjectList} columns={dataColumns}>
     </lightning-datatable>
 </template>
