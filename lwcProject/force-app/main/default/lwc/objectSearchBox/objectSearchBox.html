@@ -1,8 +1,32 @@
 <template>
     <lightning-spinner lwc:if={isLoading}></lightning-spinner>
-    <lightning-input type="text" label="Search" onchange={handleSearchChange}
-        class="slds-m-bottom_medium"></lightning-input>
 
-    <lightning-datatable key-field="Id" data={filteredObjectList} columns={dataColumns}>
-    </lightning-datatable>
+    <lightning-input
+        type="text"
+        label="Search"
+        onchange={handleSearchChange}
+        value={searchKey}
+        class="slds-m-bottom_medium"
+        data-id="search-input"
+    ></lightning-input>
+
+    <template if:true={showDropdown}>
+        <div class="slds-dropdown slds-dropdown_fluid slds-dropdown_left">
+            <ul class="slds-listbox slds-listbox_vertical" role="listbox">
+                <template for:each={filteredObjectList} for:item="obj">
+                    <li key={obj.apiName} role="presentation" class="slds-listbox__item">
+                        <div
+                            class="slds-listbox__option"
+                            role="option"
+                            tabindex="0"
+                            onclick={handleObjectSelect}
+                            data-id={obj.apiName}
+                        >
+                            {obj.label}
+                        </div>
+                    </li>
+                </template>
+            </ul>
+        </div>
+    </template>
 </template>
