@@ -1,39 +1,33 @@
 import { LightningElement, wire } from 'lwc';
-import getAllObjectDetails from "@salesforce/apex/LWC_SchemaDataService.getAllObjectDetails";
+import getAllObjectDetails from '@salesforce/apex/LWC_SchemaDataService.getAllObjectDetails';
 
 const ALL_DATA_COLUMNS = {
-    OBJECT_LABEL: { label: "Name", fieldName: "label" },
-    OBJECT_API: { label: "API", fieldName: "apiName" },
-}
+    OBJECT_LABEL: { label: 'Label', fieldName: 'label' },
+    OBJECT_API: { label: 'API Name', fieldName: 'apiName' },
+};
 
 export default class ObjectSearchBox extends LightningElement {
 
-    objectList = []; 
-    filteredObjectList = []; 
-    wiredObjects = []; 
-    isLoading = true;
+    objectList = [];
+    filteredObjectList = [];
+    selectedObject = null;
+    wiredObjects = [];
     searchKey = '';
-    dataColumns = [
-        ALL_DATA_COLUMNS.OBJECT_LABEL,
-        ALL_DATA_COLUMNS.OBJECT_API
-    ];
-
-    connectedCallback(){
-       
-    }
+    showDropdown = false;
+    isLoading = true;
 
     @wire(getAllObjectDetails)
-    objects(value) {
-        this.wiredObjects = value;
-        const { data, error } = value;
+    objects({ data, error }) {
         if (data) {
-            this.objectList = Object.keys(data).map(key => { return { label: key, apiName: data[key] }; });
+            this.objectList = Object.keys(data).map(key => {
+                return { label: key, apiName: data[key] };
+            });
             this.filteredObjectList = this.objectList;
             this.isLoading = false;
         } else if (error) {
             this.objectList = [];
             this.filteredObjectList = [];
-
+            console.error(error);
         }
     }
 
@@ -43,9 +37,17 @@ export default class ObjectSearchBox extends LightningElement {
             this.filteredObjectList = this.objectList.filter(obj =>
                 obj.label.toLowerCase().startsWith(this.searchKey)
             );
+            this.showDropdown = true;
+        } else {
+            this.filteredObjectList = [];
+            this.showDropdown = false;
         }
-        else {
-            this.filteredObjectList = this.objectList;
-        }
+    }
+
+    handleObjectSelect(event) {
+        const selectedApiName = event.target.dataset.id;
+        this.selectedObject = this.objectList.find(obj => obj.apiName === selectedApiName);
+        this.searchKey = this.selectedObject.label;
+        this.showDropdown = false;
     }
 }
